@@ -1,1 +1,2 @@
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@interchange.proxy.rlwy.net:19941/railway
+Key: DATABASE_URL
+Value: postgresql://postgres:PBFVrIuChBbWwPDjyhDYlUlYWRIeclPx@interchange.proxy.rlwy.net:19941/railway

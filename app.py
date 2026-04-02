@@ -10,15 +10,18 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Get DATABASE_URL from environment, replace postgres:// -> postgresql:// if needed
+# -------------------------------
+# Database configuration
+# -------------------------------
+# Get DATABASE_URL from environment
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
     database_url = database_url.replace("postgres://", "postgresql://")
 
-# Configure Flask SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///tasks.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
 # -------------------------------
@@ -77,9 +80,12 @@ def delete(id):
 
 # -------------------------------
 # Run App
+# -------------------------------
 if __name__ == "__main__":
+    # Ensure tables are created
     with app.app_context():
-        db.create_all()  # Ensure tables are created
+        db.create_all()
+
     # Use the PORT provided by Railway or default to 5000
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
