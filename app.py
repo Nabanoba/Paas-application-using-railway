@@ -5,23 +5,24 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env
+# Load environment variables from .env (locally)
 load_dotenv()
 
 app = Flask(__name__)
 
 # -------------------------------
-# Database configuration
+# Database Configuration
 # -------------------------------
-# Get DATABASE_URL from environment
-database_url = os.environ.get('DATABASE_URL')
-if database_url:
-    database_url = database_url.replace("postgres://", "postgresql://")
+database_url = os.environ.get("DATABASE_URL")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///tasks.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Replace postgres:// with postgresql:// if needed
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-# Initialize SQLAlchemy
+# Use DATABASE_URL if present, else fallback to SQLite for local testing
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///tasks.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 db = SQLAlchemy(app)
 
 # -------------------------------
@@ -31,7 +32,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200))
-    status = db.Column(db.String(20), default='Pending')
+    status = db.Column(db.String(20), default="Pending")
 
     def __repr__(self):
         return f"<Task {self.title}>"
@@ -39,53 +40,47 @@ class Task(db.Model):
 # -------------------------------
 # Routes
 # -------------------------------
-
-# Home / list tasks
-@app.route('/')
+@app.route("/")
 def index():
     tasks = Task.query.all()
-    return render_template('index.html', tasks=tasks)
+    return render_template("index.html", tasks=tasks)
 
-# Add new task
-@app.route('/add', methods=['GET', 'POST'])
+@app.route("/add", methods=["GET", "POST"])
 def add():
-    if request.method == 'POST':
-        title = request.form['title']
-        description = request.form['description']
+    if request.method == "POST":
+        title = request.form["title"]
+        description = request.form["description"]
         task = Task(title=title, description=description)
         db.session.add(task)
         db.session.commit()
-        return redirect('/')
-    return render_template('add_task.html')
+        return redirect("/")
+    return render_template("add_task.html")
 
-# Edit task
-@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit(id):
     task = Task.query.get_or_404(id)
-    if request.method == 'POST':
-        task.title = request.form['title']
-        task.description = request.form['description']
-        task.status = request.form.get('status', 'Pending')
+    if request.method == "POST":
+        task.title = request.form["title"]
+        task.description = request.form["description"]
+        task.status = request.form.get("status", "Pending")
         db.session.commit()
-        return redirect('/')
-    return render_template('edit_task.html', task=task)
+        return redirect("/")
+    return render_template("edit_task.html", task=task)
 
-# Delete task
-@app.route('/delete/<int:id>')
+@app.route("/delete/<int:id>")
 def delete(id):
     task = Task.query.get_or_404(id)
     db.session.delete(task)
     db.session.commit()
-    return redirect('/')
+    return redirect("/")
 
 # -------------------------------
 # Run App
 # -------------------------------
 if __name__ == "__main__":
-    # Ensure tables are created
     with app.app_context():
-        db.create_all()
+        db.create_all()  # Ensure tables are created
 
-    # Use the PORT provided by Railway or default to 5000
+    # Railway provides the PORT environment variable
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
