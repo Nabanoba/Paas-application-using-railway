@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Task</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #f7f7f7;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            opacity: 0.9;
+        }
+        a.back {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            background-color: #2196F3;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        a.back:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit Task</h1>
+    <form method="POST">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" value="{{ task.title }}" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4">{{ task.description }}</textarea>
+
+        <label for="status">Status:</label>
+        <select name="status">
+            <option value="Pending" {% if task.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Done" {% if task.status == 'Done' %}selected{% endif %}>Done</option>
+        </select>
+
+        <input type="submit" value="Update Task">
+    </form>
+    <a href="/" class="back">Back to Task List</a>
+</body>
+</html>

@@ -1,0 +1,1 @@
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@interchange.proxy.rlwy.net:19941/railway
