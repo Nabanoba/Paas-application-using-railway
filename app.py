@@ -77,8 +77,9 @@ def delete(id):
 
 # -------------------------------
 # Run App
-# -------------------------------
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # Ensure tables are created
-app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    # Use the PORT provided by Railway or default to 5000
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host="0.0.0.0", port=port)
