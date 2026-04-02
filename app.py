@@ -2,23 +2,17 @@
 
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
 import os
-
-# Load environment variables from .env (for local testing)
-load_dotenv()
 
 app = Flask(__name__)
 
 # -------------------------------
 # Database Configuration
 # -------------------------------
-# Use Railway DATABASE_URL if available, else fallback to local SQLite
 database_url = os.environ.get("DATABASE_URL")
 
 if not database_url:
-    print("Warning: DATABASE_URL not set. Using local SQLite database.")
-    database_url = "sqlite:///tasks.db"
+    raise RuntimeError("DATABASE_URL environment variable not set! Cannot connect to PostgreSQL.")
 
 # SQLAlchemy expects 'postgresql://' instead of 'postgres://'
 if database_url.startswith("postgres://"):
@@ -79,13 +73,23 @@ def delete(id):
     return redirect("/")
 
 # -------------------------------
+# Test Route for DB Connection
+# -------------------------------
+@app.route("/test-db")
+def test_db():
+    try:
+        tasks = Task.query.all()
+        return f"Database connected successfully! Tasks count: {len(tasks)}"
+    except Exception as e:
+        return f"Database connection error: {e}"
+
+# -------------------------------
 # Run App
 # -------------------------------
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # Ensure tables are created
 
-    # Railway provides the PORT environment variable
     port = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_DEBUG", "False") == "True"
     app.run(debug=debug, host="0.0.0.0", port=port)
