@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env (locally)
+# Load environment variables from .env (for local testing)
 load_dotenv()
 
 app = Flask(__name__)
@@ -13,14 +13,18 @@ app = Flask(__name__)
 # -------------------------------
 # Database Configuration
 # -------------------------------
+# Use Railway DATABASE_URL if available, else fallback to local SQLite
 database_url = os.environ.get("DATABASE_URL")
 
-# Replace postgres:// with postgresql:// if needed
-if database_url and database_url.startswith("postgres://"):
+if not database_url:
+    print("Warning: DATABASE_URL not set. Using local SQLite database.")
+    database_url = "sqlite:///tasks.db"
+
+# SQLAlchemy expects 'postgresql://' instead of 'postgres://'
+if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-# Use DATABASE_URL if present, else fallback to SQLite for local testing
-app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///tasks.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -83,4 +87,5 @@ if __name__ == "__main__":
 
     # Railway provides the PORT environment variable
     port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=port)
+    debug = os.environ.get("FLASK_DEBUG", "False") == "True"
+    app.run(debug=debug, host="0.0.0.0", port=port)
