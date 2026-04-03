@@ -78,4 +78,3 @@ def test_db():
     except Exception as e:
         return f"Database connection error: {e}"
 
-# -------------------------------
