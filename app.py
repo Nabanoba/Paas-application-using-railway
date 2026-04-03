@@ -77,4 +77,3 @@ def test_db():
         return f"Database connected successfully! Tasks count: {len(tasks)}"
     except Exception as e:
         return f"Database connection error: {e}"
-
