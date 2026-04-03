@@ -79,7 +79,3 @@ def test_db():
         return f"Database connection error: {e}"
 
 # -------------------------------
-# Run App
-# -------------------------------
-with app.app_context():
-    db.create_all()  # Ensure tables are created
