@@ -10,11 +10,9 @@ app = Flask(__name__)
 # Database Configuration
 # -------------------------------
 database_url = os.environ.get("DATABASE_URL")
-
 if not database_url:
     raise RuntimeError("DATABASE_URL environment variable not set! Cannot connect to PostgreSQL.")
 
-# SQLAlchemy expects 'postgresql://' instead of 'postgres://'
 if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
@@ -72,9 +70,6 @@ def delete(id):
     db.session.commit()
     return redirect("/")
 
-# -------------------------------
-# Test Route for DB Connection
-# -------------------------------
 @app.route("/test-db")
 def test_db():
     try:
